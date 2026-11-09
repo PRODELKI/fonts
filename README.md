@@ -4,6 +4,8 @@
 
 [73 шрифта из каталога PRODELKI](catalog/) — файлы TTF с номерами из подборки и лицензиями SIL OFL.
 
+[9 необычных шрифтов из отдельной подборки](creative/) — TTF и лицензии SIL OFL.
+
 | Шрифт | Файл | Лицензия |
 | --- | --- | --- |
 | Gergel | [Gergel.otf](Gergel.otf) | [SIL OFL 1.1](Gergel-OFL.txt) |
