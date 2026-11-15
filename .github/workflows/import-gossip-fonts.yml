@@ -1,0 +1,59 @@
+name: Import licensed Gossip font files
+on:
+  push:
+    paths:
+      - '.github/workflows/import-gossip-fonts.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify original font archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gossip-import imported/gossip
+          curl --fail --location --retry 3 --proto '=https' --tlsv1.2             'https://type.lab.joshwel.co/download/gossip.zip' -o /tmp/gossip-import/gossip.zip
+          python3 - <<'PY'
+          import zipfile, pathlib, shutil, re
+          source=pathlib.Path('/tmp/gossip-import/gossip.zip')
+          dest=pathlib.Path('imported/gossip')
+          with zipfile.ZipFile(source) as z:
+              infos=z.infolist()
+              licenses=[x for x in infos if not x.is_dir() and re.search(r'(ofl|licen[cs]e|copyright)',pathlib.PurePosixPath(x.filename).name,re.I)]
+              licensed=False
+              for x in licenses:
+                  data=z.read(x)
+                  if b'OPEN FONT LICENSE' in data.upper() or b'OFL-1.1' in data.upper():
+                      licensed=True
+                      (dest/'OFL.txt').write_bytes(data)
+                      break
+              if not licensed:
+                  raise SystemExit('No bundled SIL OFL license found: do not redistribute')
+              fonts=[x for x in infos if not x.is_dir() and x.filename.lower().endswith(('.ttf','.otf'))]
+              if not fonts:
+                  raise SystemExit('No TTF/OTF found')
+              for i,x in enumerate(fonts):
+                  safe=pathlib.PurePosixPath(x.filename).name
+                  if (dest/safe).exists():
+                      safe=f'{i:02d}-{safe}'
+                  (dest/safe).write_bytes(z.read(x))
+              print(f'Installed {len(fonts)} fonts with bundled OFL license.')
+          PY
+      - name: Record provenance
+        run: |
+          printf '%s\n' '# Gossip font by Deborah Khodanovich' '' 'Source: https://gossip.cargo.site/font' 'Archive mirror: https://type.lab.joshwel.co/download/gossip.zip' 'License: See OFL.txt shipped alongside font files.' 'Note: Gossip contains Latin letters; Cyrillic is not supported.' > imported/gossip/README.md
+      - name: Commit font files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add imported/gossip
+          if ! git diff --cached --quiet; then
+            git commit -m 'fonts: import Gossip under verified bundled OFL license'
+            git push
+          fi
