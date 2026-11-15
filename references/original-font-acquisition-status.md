@@ -16,7 +16,11 @@ This index documents **original font sources**, not replacement fonts, and disti
 | Шелест | Reference image only | No | Reliable original source not established |
 | Stylization | Reference image only | No | May describe lettering technique instead of an actual font |
 
-For the free original files **not permitted to be redistributed**, use the author's download link and install directly on your device, rather than uploading font binaries to GitHub. A published font file and an image specimen are different assets.
+## Intended use: private project library
+
+The owner needs these original fonts for their own websites, branding, design and visual works, **not** as a font download collection. However this repository is currently public. Do not commit restricted TTF/OTF binaries here. A private repository is preferable for licensed local font storage, but private storage does not override individual EULA rules about copying, team access, web embedding, or commercial usage. For a public-facing website, check a webfont license before uploading WOFF/WOFF2. For personal-use-only fonts, do not use them in commercial projects without an appropriate license.
+
+For the original files **not permitted to be redistributed**, use the author's download link and install directly on the owner's device, rather than uploading binaries to this public GitHub repository. A published font file and an image specimen are different assets.
 
 ## Import automation
 
